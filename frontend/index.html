@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChainTrace — Blockchain Supply Chain</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Exo+2:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- QR Code library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============================================
+       LOADER SCREEN
+  ============================================ -->
+  <div id="loader" class="loader-screen">
+    <div class="loader-content">
+      <div class="loader-hex">
+        <div class="hex-ring"></div>
+        <div class="hex-ring ring2"></div>
+        <div class="hex-ring ring3"></div>
+      </div>
+      <div class="loader-logo">ChainTrace</div>
+      <div class="loader-sub">Initializing Blockchain Network...</div>
+      <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       APP WRAPPER
+  ============================================ -->
+  <div id="app" class="app-wrapper hidden">
+
+    <!-- =====================
+         LOGIN PAGE
+    ===================== -->
+    <div id="page-login" class="page active">
+      <div class="login-bg">
+        <div class="grid-overlay"></div>
+        <div class="particle" style="--x:10%;--y:20%;--s:4px;--d:6s"></div>
+        <div class="particle" style="--x:80%;--y:15%;--s:3px;--d:8s"></div>
+        <div class="particle" style="--x:30%;--y:70%;--s:5px;--d:5s"></div>
+        <div class="particle" style="--x:90%;--y:60%;--s:3px;--d:7s"></div>
+        <div class="particle" style="--x:50%;--y:90%;--s:4px;--d:9s"></div>
+        <div class="particle" style="--x:70%;--y:45%;--s:6px;--d:4s"></div>
+      </div>
+
+      <div class="login-container">
+        <!-- Brand -->
+        <div class="login-brand">
+          <div class="brand-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="none" stroke="var(--accent)" stroke-width="2"/>
+              <polygon points="24,10 36,17 36,31 24,38 12,31 12,17" fill="none" stroke="var(--accent2)" stroke-width="1.5" opacity="0.6"/>
+              <circle cx="24" cy="24" r="5" fill="var(--accent)"/>
+              <line x1="24" y1="2" x2="24" y2="10" stroke="var(--accent)" stroke-width="1.5"/>
+              <line x1="44" y1="13" x2="36" y2="17" stroke="var(--accent)" stroke-width="1.5"/>
+              <line x1="44" y1="35" x2="36" y2="31" stroke="var(--accent)" stroke-width="1.5"/>
+              <line x1="24" y1="46" x2="24" y2="38" stroke="var(--accent)" stroke-width="1.5"/>
+              <line x1="4" y1="35" x2="12" y2="31" stroke="var(--accent)" stroke-width="1.5"/>
+              <line x1="4" y1="13" x2="12" y2="17" stroke="var(--accent)" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h1 class="brand-name">ChainTrace</h1>
+          <p class="brand-tagline">Blockchain-Powered Supply Chain</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="login-card" id="login-form-card">
+          <div class="card-header">
+            <h2>Sign In</h2>
+            <p>Access your supply chain dashboard</p>
+          </div>
+
+          <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label>Username</label>
+              <div class="input-wrap">
+                <span class="input-icon">◈</span>
+                <input type="text" id="login-username" placeholder="Enter username" autocomplete="username" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Password</label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="login-password" placeholder="Enter password" autocomplete="current-password" required />
+                <button type="button" class="toggle-pw" onclick="togglePassword('login-password')">👁</button>
+              </div>
+            </div>
+
+            <div id="login-error" class="form-error hidden"></div>
+
+            <button type="submit" class="btn-primary btn-full" id="login-btn">
+              <span class="btn-text">Sign In</span>
+              <span class="btn-loader hidden">⟳</span>
+            </button>
+          </form>
+
+          <div class="auth-switch">
+            <span>Don't have an account?</span>
+            <button onclick="showRegister()" class="link-btn">Create Account</button>
+          </div>
+
+          <!-- Demo credentials -->
+          <div class="demo-creds">
+            <div class="demo-label">⚡ Quick Demo Login</div>
+            <div class="demo-grid">
+              <button onclick="fillDemo('farmer1','password123')" class="demo-role farmer">Farmer</button>
+              <button onclick="fillDemo('dist1','password123')" class="demo-role distributor">Distributor</button>
+              <button onclick="fillDemo('retail1','password123')" class="demo-role retailer">Retailer</button>
+              <button onclick="fillDemo('admin','password123')" class="demo-role admin">Admin</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Register Card -->
+        <div class="login-card hidden" id="register-form-card">
+          <div class="card-header">
+            <h2>Create Account</h2>
+            <p>Join the supply chain network</p>
+          </div>
+
+          <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Username</label>
+                <div class="input-wrap">
+                  <span class="input-icon">◈</span>
+                  <input type="text" id="reg-username" placeholder="username" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Full Name</label>
+                <div class="input-wrap">
+                  <span class="input-icon">👤</span>
+                  <input type="text" id="reg-fullname" placeholder="Full name" required />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <div class="input-wrap">
+                <span class="input-icon">✉</span>
+                <input type="email" id="reg-email" placeholder="email@example.com" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrap">
+                  <span class="input-icon">🔒</span>
+                  <input type="password" id="reg-password" placeholder="Min 6 chars" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Role</label>
+                <div class="input-wrap">
+                  <span class="input-icon">🏷</span>
+                  <select id="reg-role" required>
+                    <option value="">Select role</option>
+                    <option value="Farmer">🌾 Farmer</option>
+                    <option value="Distributor">🚚 Distributor</option>
+                    <option value="Retailer">🏪 Retailer</option>
+                    <option value="Customer">👤 Customer</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="register-error" class="form-error hidden"></div>
+            <div id="register-success" class="form-success hidden"></div>
+
+            <button type="submit" class="btn-primary btn-full" id="register-btn">
+              <span class="btn-text">Create Account + Generate Wallet</span>
+              <span class="btn-loader hidden">⟳</span>
+            </button>
+          </form>
+
+          <div class="auth-switch">
+            <span>Already have an account?</span>
+            <button onclick="showLogin()" class="link-btn">Sign In</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================
+         MAIN APP (Post Login)
+    ===================== -->
+    <div id="page-app" class="page hidden">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+              <polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+              <circle cx="24" cy="24" r="5" fill="var(--accent)"/>
+            </svg>
+            <span>ChainTrace</span>
+          </div>
+          <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        </div>
+
+        <!-- User Card -->
+        <div class="sidebar-user">
+          <div class="user-avatar" id="sidebar-avatar">F</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebar-name">Loading...</div>
+            <div class="user-role-badge" id="sidebar-role">—</div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-item active" onclick="showSection('dashboard')" data-section="dashboard">
+            <span class="nav-icon">⬡</span>
+            <span class="nav-text">Dashboard</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('add-product')" data-section="add-product" id="nav-add">
+            <span class="nav-icon">⊕</span>
+            <span class="nav-text">Add Product</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('update-status')" data-section="update-status">
+            <span class="nav-icon">⟳</span>
+            <span class="nav-text">Update Stage</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('track-product')" data-section="track-product">
+            <span class="nav-icon">◎</span>
+            <span class="nav-text">Track Product</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('all-products')" data-section="all-products">
+            <span class="nav-icon">≡</span>
+            <span class="nav-text">All Products</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('admin')" data-section="admin" id="nav-admin">
+            <span class="nav-icon">⚙</span>
+            <span class="nav-text">Admin Overview</span>
+          </a>
+          <a href="#" class="nav-item" onclick="showSection('wallet')" data-section="wallet">
+            <span class="nav-icon">◈</span>
+            <span class="nav-text">My Wallet</span>
+          </a>
+        </nav>
+
+        <!-- Stellar Status -->
+        <div class="sidebar-footer">
+          <div class="stellar-status" id="stellar-status">
+            <div class="status-dot pulsing"></div>
+            <span>Stellar Testnet</span>
+          </div>
+          <button class="btn-logout" onclick="logout()">⏻ Logout</button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content" id="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+          <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+            <div class="topbar-title" id="topbar-title">Dashboard</div>
+          </div>
+          <div class="topbar-right">
+            <div class="topbar-time" id="topbar-time">--:--</div>
+            <div class="topbar-user">
+              <div class="mini-avatar" id="topbar-avatar">F</div>
+              <span id="topbar-username">User</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================
+             DASHBOARD SECTION
+        ===================== -->
+        <section id="section-dashboard" class="content-section active">
+          <div class="section-header">
+            <h2>Network Overview</h2>
+            <button class="btn-refresh" onclick="loadDashboard()">⟳ Refresh</button>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card" data-color="cyan">
+              <div class="stat-icon">📦</div>
+              <div class="stat-info">
+                <div class="stat-value" id="stat-total">—</div>
+                <div class="stat-label">Total Products</div>
+              </div>
+              <div class="stat-ring"></div>
+            </div>
+            <div class="stat-card" data-color="green">
+              <div class="stat-icon">✅</div>
+              <div class="stat-info">
+                <div class="stat-value" id="stat-delivered">—</div>
+                <div class="stat-label">Delivered</div>
+              </div>
+              <div class="stat-ring"></div>
+            </div>
+            <div class="stat-card" data-color="amber">
+              <div class="stat-icon">🚚</div>
+              <div class="stat-info">
+                <div class="stat-value" id="stat-transit">—</div>
+                <div class="stat-label">In Transit</div>
+              </div>
+              <div class="stat-ring"></div>
+            </div>
+            <div class="stat-card" data-color="purple">
+              <div class="stat-icon">🌾</div>
+              <div class="stat-info">
+                <div class="stat-value" id="stat-harvested">—</div>
+                <div class="stat-label">Harvested</div>
+              </div>
+              <div class="stat-ring"></div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="charts-row">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>Products by Stage</h3>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="stageChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>Recent Activity</h3>
+              </div>
+              <div id="recent-activity" class="activity-list">
+                <div class="loading-state">Loading...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stellar Network Status -->
+          <div class="network-card">
+            <div class="network-header">
+              <div class="status-dot pulsing"></div>
+              <h3>Stellar Testnet Status</h3>
+            </div>
+            <div class="network-grid" id="network-info">
+              <div class="net-item"><span class="net-label">Network</span><span class="net-val" id="net-name">—</span></div>
+              <div class="net-item"><span class="net-label">Latest Ledger</span><span class="net-val" id="net-ledger">—</span></div>
+              <div class="net-item"><span class="net-label">Ledger Time</span><span class="net-val" id="net-time">—</span></div>
+              <div class="net-item"><span class="net-label">Horizon URL</span><span class="net-val" id="net-url">—</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================
+             ADD PRODUCT SECTION
+        ===================== -->
+        <section id="section-add-product" class="content-section hidden">
+          <div class="section-header">
+            <h2>Add New Product</h2>
+            <div class="section-badge">Farmer Only</div>
+          </div>
+
+          <div class="form-layout">
+            <div class="form-card">
+              <form id="add-product-form" onsubmit="handleAddProduct(event)">
+                <div class="form-section-title">📋 Product Information</div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Product ID *</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">🔑</span>
+                      <input type="text" id="prod-id" placeholder="e.g., RICE-2024-001" required />
+                    </div>
+                    <small>Unique identifier (auto-uppercased)</small>
+                  </div>
+                  <div class="form-group">
+                    <label>Product Name *</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">📦</span>
+                      <input type="text" id="prod-name" placeholder="e.g., Organic Basmati Rice" required />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Category</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">🏷</span>
+                      <select id="prod-category">
+                        <option value="Grains">🌾 Grains</option>
+                        <option value="Vegetables">🥦 Vegetables</option>
+                        <option value="Fruits">🍎 Fruits</option>
+                        <option value="Dairy">🥛 Dairy</option>
+                        <option value="Meat">🥩 Meat</option>
+                        <option value="Seafood">🐟 Seafood</option>
+                        <option value="Packaged">📫 Packaged</option>
+                        <option value="Other">📦 Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Origin Location *</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">📍</span>
+                      <input type="text" id="prod-origin" placeholder="e.g., Amritsar, Punjab" required />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Description</label>
+                  <textarea id="prod-desc" placeholder="Product details, quality grade, certifications..." rows="3"></textarea>
+                </div>
+
+                <div class="form-section-title">📊 Quantity & Pricing</div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Quantity *</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">⚖</span>
+                      <input type="number" id="prod-qty" placeholder="500" min="0" step="0.01" required />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Unit</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">📏</span>
+                      <select id="prod-unit">
+                        <option value="kg">kg</option>
+                        <option value="g">grams</option>
+                        <option value="liter">liter</option>
+                        <option value="units">units</option>
+                        <option value="boxes">boxes</option>
+                        <option value="tons">tons</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Price/Unit (₹)</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">₹</span>
+                      <input type="number" id="prod-price" placeholder="45.00" min="0" step="0.01" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Expiry Date (Optional)</label>
+                  <div class="input-wrap">
+                    <span class="input-icon">📅</span>
+                    <input type="date" id="prod-expiry" />
+                  </div>
+                </div>
+
+                <div id="add-product-error" class="form-error hidden"></div>
+                <div id="add-product-success" class="form-success hidden"></div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-secondary" onclick="clearAddForm()">✕ Clear</button>
+                  <button type="submit" class="btn-primary" id="add-product-btn">
+                    <span class="btn-text">⊕ Add Product + Record on Blockchain</span>
+                    <span class="btn-loader hidden">⟳ Recording...</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel">
+              <div class="info-card">
+                <h4>⛓️ Blockchain Recording</h4>
+                <p>Each product is automatically recorded on <strong>Stellar Testnet</strong> with an immutable transaction memo.</p>
+                <div class="memo-example">
+                  <code>ProductID:RICE-001|Stage:Harvested|Location:Punjab</code>
+                </div>
+              </div>
+              <div class="info-card">
+                <h4>📱 QR Code</h4>
+                <p>A unique QR code is generated for every product, enabling instant tracking.</p>
+              </div>
+              <div class="info-card">
+                <h4>🔐 Security</h4>
+                <p>Your Stellar wallet signs each transaction, creating a tamper-proof audit trail.</p>
+              </div>
+
+              <!-- QR Preview -->
+              <div class="qr-preview hidden" id="qr-preview">
+                <h4>📱 Generated QR Code</h4>
+                <img id="qr-image" src="" alt="QR Code" />
+                <div id="qr-product-id" class="qr-id"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================
+             UPDATE STATUS SECTION
+        ===================== -->
+        <section id="section-update-status" class="content-section hidden">
+          <div class="section-header">
+            <h2>Update Supply Chain Stage</h2>
+          </div>
+
+          <div class="form-layout">
+            <div class="form-card">
+              <form id="update-form" onsubmit="handleUpdateStage(event)">
+                <div class="form-section-title">🔍 Product Lookup</div>
+
+                <div class="form-group">
+                  <label>Product ID *</label>
+                  <div class="input-with-btn">
+                    <div class="input-wrap">
+                      <span class="input-icon">🔑</span>
+                      <input type="text" id="update-prod-id" placeholder="Enter Product ID" required />
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="lookupProduct()">🔍 Lookup</button>
+                  </div>
+                </div>
+
+                <!-- Product Preview (shown after lookup) -->
+                <div id="product-preview" class="product-preview hidden">
+                  <div class="preview-header">
+                    <span id="prev-name">—</span>
+                    <span class="stage-badge" id="prev-stage">—</span>
+                  </div>
+                  <div class="preview-details">
+                    <span>📍 <span id="prev-location">—</span></span>
+                    <span>🌾 <span id="prev-origin">—</span></span>
+                  </div>
+                </div>
+
+                <div class="form-section-title">📋 Stage Update</div>
+
+                <!-- Stage Selector (visual) -->
+                <div class="stage-selector">
+                  <div class="stage-option" data-stage="Processing" onclick="selectStage('Processing')">
+                    <div class="stage-dot"></div>
+                    <span>Processing</span>
+                  </div>
+                  <div class="stage-option" data-stage="Packaged" onclick="selectStage('Packaged')">
+                    <div class="stage-dot"></div>
+                    <span>Packaged</span>
+                  </div>
+                  <div class="stage-option" data-stage="In Transit" onclick="selectStage('In Transit')">
+                    <div class="stage-dot"></div>
+                    <span>In Transit</span>
+                  </div>
+                  <div class="stage-option" data-stage="Warehouse" onclick="selectStage('Warehouse')">
+                    <div class="stage-dot"></div>
+                    <span>Warehouse</span>
+                  </div>
+                  <div class="stage-option" data-stage="Retailer" onclick="selectStage('Retailer')">
+                    <div class="stage-dot"></div>
+                    <span>Retailer</span>
+                  </div>
+                  <div class="stage-option" data-stage="Delivered" onclick="selectStage('Delivered')">
+                    <div class="stage-dot"></div>
+                    <span>Delivered</span>
+                  </div>
+                </div>
+                <input type="hidden" id="selected-stage" required />
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Current Location *</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">📍</span>
+                      <input type="text" id="update-location" placeholder="e.g., Mumbai Warehouse" required />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Temperature (optional)</label>
+                    <div class="input-wrap">
+                      <span class="input-icon">🌡</span>
+                      <input type="text" id="update-temp" placeholder="e.g., 4°C" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Notes</label>
+                  <textarea id="update-notes" placeholder="Additional details about this update..." rows="2"></textarea>
+                </div>
+
+                <div id="update-error" class="form-error hidden"></div>
+                <div id="update-success" class="form-success hidden"></div>
+
+                <!-- Blockchain TX result -->
+                <div id="tx-result" class="tx-result hidden">
+                  <div class="tx-header">
+                    <div class="tx-status confirmed">✓ Transaction Confirmed</div>
+                  </div>
+                  <div class="tx-detail">
+                    <span class="tx-label">TX Hash:</span>
+                    <a href="#" class="tx-hash" id="tx-hash-link" target="_blank">—</a>
+                  </div>
+                  <div class="tx-detail">
+                    <span class="tx-label">Memo:</span>
+                    <code id="tx-memo">—</code>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary" id="update-btn">
+                    <span class="btn-text">⟳ Update Stage on Blockchain</span>
+                    <span class="btn-loader hidden">⟳ Recording...</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Stage Flow Diagram -->
+            <div class="info-panel">
+              <div class="info-card">
+                <h4>🔄 Supply Chain Flow</h4>
+                <div class="flow-diagram">
+                  <div class="flow-step active-flow">🌾 Farmer<br/><small>Harvested</small></div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">⚙️ Processing</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">📦 Packaged</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">🚚 Transit</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">🏭 Warehouse</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">🏪 Retailer</div>
+                  <div class="flow-arrow">→</div>
+                  <div class="flow-step">✅ Delivered</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================
+             TRACK PRODUCT SECTION
+        ===================== -->
+        <section id="section-track-product" class="content-section hidden">
+          <div class="section-header">
+            <h2>Track Product</h2>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="track-search">
+            <div class="search-wrap">
+              <span class="search-icon">◎</span>
+              <input type="text" id="track-input" placeholder="Enter Product ID (e.g., RICE-2024-001)" />
+              <button class="btn-primary" onclick="trackProduct()">Track →</button>
+            </div>
+          </div>
+
+          <!-- Product Not Found -->
+          <div id="track-not-found" class="empty-state hidden">
+            <div class="empty-icon">◎</div>
+            <h3>Product Not Found</h3>
+            <p>No product with that ID exists. Check and try again.</p>
+          </div>
+
+          <!-- Tracking Results -->
+          <div id="track-results" class="hidden">
+            <!-- Product Header -->
+            <div class="track-header-card">
+              <div class="track-header-left">
+                <div class="track-product-id" id="track-display-id">—</div>
+                <div class="track-product-name" id="track-display-name">—</div>
+                <div class="track-meta">
+                  <span>📍 <span id="track-display-location">—</span></span>
+                  <span>🌾 Origin: <span id="track-display-origin">—</span></span>
+                  <span>📅 <span id="track-display-date">—</span></span>
+                </div>
+              </div>
+              <div class="track-header-right">
+                <div class="current-stage-badge" id="track-current-stage">—</div>
+                <div id="track-qr" class="track-qr"></div>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline-card">
+              <h3>📍 Journey Timeline</h3>
+              <div class="timeline" id="timeline-container"></div>
+            </div>
+
+            <!-- Blockchain History -->
+            <div class="blockchain-card">
+              <h3>⛓️ Blockchain Transactions</h3>
+              <div id="blockchain-txns" class="tx-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================
+             ALL PRODUCTS SECTION
+        ===================== -->
+        <section id="section-all-products" class="content-section hidden">
+          <div class="section-header">
+            <h2>All Products</h2>
+            <div class="header-actions">
+              <input type="text" id="search-input" placeholder="🔍 Search products..." class="search-input" oninput="filterProducts()" />
+              <select id="stage-filter" class="filter-select" onchange="filterProducts()">
+                <option value="">All Stages</option>
+                <option>Harvested</option>
+                <option>Processing</option>
+                <option>Packaged</option>
+                <option>In Transit</option>
+                <option>Warehouse</option>
+                <option>Retailer</option>
+                <option>Delivered</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="products-grid" class="products-grid">
+            <div class="loading-state">Loading products...</div>
+          </div>
+        </section>
+
+        <!-- =====================
+             ADMIN SECTION
+        ===================== -->
+        <section id="section-admin" class="content-section hidden">
+          <div class="section-header">
+            <h2>Admin Overview</h2>
+            <div class="section-badge admin-badge">Admin Only</div>
+          </div>
+
+          <div class="admin-grid">
+            <!-- Users Table -->
+            <div class="admin-card full-width">
+              <h3>👥 Registered Users</h3>
+              <div class="table-wrap">
+                <table class="data-table" id="users-table">
+                  <thead>
+                    <tr>
+                      <th>Username</th>
+                      <th>Full Name</th>
+                      <th>Role</th>
+                      <th>Email</th>
+                      <th>Stellar Wallet</th>
+                      <th>Joined</th>
+                    </tr>
+                  </thead>
+                  <tbody id="users-table-body">
+                    <tr><td colspan="6" class="loading-td">Loading users...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="admin-card full-width">
+              <h3>📦 Product Registry</h3>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Product ID</th>
+                      <th>Name</th>
+                      <th>Origin</th>
+                      <th>Stage</th>
+                      <th>Created By</th>
+                      <th>Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-products-body">
+                    <tr><td colspan="7" class="loading-td">Loading...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================
+             WALLET SECTION
+        ===================== -->
+        <section id="section-wallet" class="content-section hidden">
+          <div class="section-header">
+            <h2>My Stellar Wallet</h2>
+          </div>
+
+          <div class="wallet-layout">
+            <div class="wallet-card">
+              <div class="wallet-header">
+                <div class="wallet-icon">◈</div>
+                <div>
+                  <h3>Stellar Testnet Wallet</h3>
+                  <p>Your blockchain identity</p>
+                </div>
+              </div>
+
+              <div class="wallet-balance-display">
+                <div class="balance-amount" id="wallet-balance">—</div>
+                <div class="balance-unit">XLM (Lumens)</div>
+              </div>
+
+              <div class="wallet-key-display">
+                <label>Public Key (Safe to share)</label>
+                <div class="key-box">
+                  <code id="wallet-pubkey">Loading...</code>
+                  <button onclick="copyKey()" class="copy-btn">📋</button>
+                </div>
+              </div>
+
+              <div class="wallet-key-display">
+                <label>Network</label>
+                <div class="key-box">
+                  <code>Stellar Testnet (TESTNET)</code>
+                </div>
+              </div>
+
+              <div class="wallet-actions">
+                <button class="btn-secondary" onclick="loadWallet()">⟳ Refresh Balance</button>
+                <a href="#" id="stellar-explorer-link" target="_blank" class="btn-outline">🔗 View on Explorer</a>
+              </div>
+            </div>
+
+            <div class="wallet-info-panel">
+              <div class="info-card">
+                <h4>🌟 What is Stellar?</h4>
+                <p>Stellar is a decentralized blockchain network. Your wallet is used to sign supply chain transactions, creating an immutable audit trail.</p>
+              </div>
+              <div class="info-card">
+                <h4>💰 Testnet XLM</h4>
+                <p>Your account is funded with <strong>10,000 XLM</strong> via Friendbot on testnet. This is test currency only, not real money.</p>
+              </div>
+              <div class="info-card">
+                <h4>🔒 Private Key Safety</h4>
+                <p>Your private key is stored securely on the server. In production, use Hardware Security Modules (HSM) for maximum security.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container"></div>
+
+  <!-- ============================================
+       MODAL (for QR code, etc.)
+  ============================================ -->
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
